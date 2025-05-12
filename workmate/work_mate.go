@@ -1,10 +1,10 @@
-package matecfg
+package workmate
 
 import (
 	"encoding/json"
 	"os"
 
-	"github.com/go-mate/go-work/workcfg"
+	"github.com/go-mate/go-work/workspace"
 	"github.com/yyle88/must"
 	"github.com/yyle88/rese"
 )
@@ -22,8 +22,8 @@ func NewWorkspace(path string) *Workspace {
 	return res
 }
 
-func (wc *Workspace) GetWorkspace() *workcfg.Workspace {
-	return &workcfg.Workspace{
+func (wc *Workspace) GetWorkspace() *workspace.Workspace {
+	return &workspace.Workspace{
 		WorkRoot: wc.WorkRoot,
 		Projects: wc.Projects,
 	}
