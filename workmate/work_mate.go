@@ -1,9 +1,9 @@
 // Package workmate: JSON configuration loading component to manage Go workspace
-// Provides simple configuration file parsing of workspace and project paths
+// Provides simple configuration parsing of workspace and project paths
 // Works great with go-work package workspace structures
 //
 // workmate: Go 工作区管理的 JSON 配置加载组件
-// 提供工作区和项目路径的简单配置文件解析
+// 提供工作区和项目路径的简单配置解析
 // 与 go-work 包的工作区结构良好配合
 package workmate
 
@@ -18,28 +18,28 @@ import (
 
 // Workspace represents a JSON configuration structure to manage workspace
 // Contains workspace root DIR and list of project paths supporting multi-project development
-// Designed to support simple JSON serialization and deserialization
+// Integrates with go-work package through standard workspace format conversion
 //
 // Workspace 代表工作区管理的 JSON 配置结构
 // 包含工作区根目录和用于多项目开发的项目路径列表
-// 设计支持便捷的 JSON 序列化和反序列化
+// 通过标准工作区格式转换与 go-work 包集成
 type Workspace struct {
 	WorkRoot string   `json:"workRoot"` // Workspace root DIR // 工作区根目录
 	Projects []string `json:"projects"` // Project paths in this workspace // 此工作区中的项目路径
 }
 
-// NewWorkspace loads workspace configuration from JSON file at specified path
-// Opens and parses JSON configuration file into Workspace struct
+// NewWorkspace loads workspace configuration from JSON config at specified path
+// Opens and parses JSON configuration into Workspace struct
 // Returns configured Workspace prepared to use with go-work operations
 //
-// NewWorkspace 从指定路径的 JSON 文件加载工作区配置
-// 打开并解析 JSON 配置文件到 Workspace 结构
+// NewWorkspace 从指定路径的 JSON 配置加载工作区配置
+// 打开并解析 JSON 配置到 Workspace 结构
 // 返回配置好的工作区，可用在 go-work 操作中
 func NewWorkspace(path string) *Workspace {
-	file := rese.P1(os.Open(path))
-	defer rese.F0(file.Close)
+	fp := rese.P1(os.Open(path))
+	defer rese.F0(fp.Close)
 	res := &Workspace{}
-	must.Done(json.NewDecoder(file).Decode(res))
+	must.Done(json.NewDecoder(fp).Decode(res))
 	return res
 }
 

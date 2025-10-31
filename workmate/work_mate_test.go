@@ -11,13 +11,20 @@ import (
 	"github.com/yyle88/rese"
 )
 
+// TestNewWorkspace verifies workspace configuration loading from JSON
+// Creates temp DIR, writes test config, loads workspace, and validates content
+// Environment setup uses rese/must while test verification uses require
+//
+// TestNewWorkspace 验证从 JSON 加载工作区配置
+// 创建临时 DIR，写入测试配置，加载工作区并验证内容
+// 环境设置使用 rese/must，测试验证使用 require
 func TestNewWorkspace(t *testing.T) {
-	// Get temporary DIR for test
-	// 获取测试用的临时 DIR
+	// Get temp DIR during test - auto-creates and auto-cleans
+	// 获取测试中的临时 DIR - 自动创建和清理
 	tempDIR := t.TempDir()
 
-	// Create test configuration file
-	// 创建测试配置文件
+	// Create test configuration
+	// 创建测试配置
 	configPath := filepath.Join(tempDIR, "test-config.json")
 	config := &Workspace{
 		WorkRoot: "/Users/test/projects",
@@ -27,18 +34,18 @@ func TestNewWorkspace(t *testing.T) {
 		},
 	}
 
-	// Write configuration to file
-	// 将配置写入文件
-	file := rese.P1(os.Create(configPath))
-	must.Done(json.NewEncoder(file).Encode(config))
-	rese.F0(file.Close)
+	// Write configuration to JSON - must succeed during test setup
+	// 将配置写入 JSON - 测试设置必须成功
+	fp := rese.P1(os.Create(configPath))
+	must.Done(json.NewEncoder(fp).Encode(config))
+	rese.F0(fp.Close)
 
-	// Load workspace from configuration file
-	// 从配置文件加载工作区
+	// Load workspace from configuration
+	// 从配置加载工作区
 	workspace := NewWorkspace(configPath)
 
-	// Verify loaded workspace
-	// 验证加载的工作区
+	// Check loaded workspace - test verification uses require
+	// 验证加载的工作区 - 测试验证使用 require
 	require.NotNil(t, workspace)
 	require.Equal(t, "/Users/test/projects", workspace.WorkRoot)
 	require.Len(t, workspace.Projects, 2)

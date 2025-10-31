@@ -1,7 +1,7 @@
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/go-mate/go-mate/release.yml?branch=main&label=BUILD)](https://github.com/go-mate/go-mate/actions/workflows/release.yml?query=branch%3Amain)
 [![GoDoc](https://pkg.go.dev/badge/github.com/go-mate/go-mate)](https://pkg.go.dev/github.com/go-mate/go-mate)
 [![Coverage Status](https://img.shields.io/coveralls/github/go-mate/go-mate/main.svg)](https://coveralls.io/github/go-mate/go-mate?branch=main)
-[![Supported Go Versions](https://img.shields.io/badge/Go-1.25+-lightgrey.svg)](https://go.dev/)
+[![Supported Go Versions](https://img.shields.io/badge/Go-1.25+-lightgrey.svg)](https://github.com/go-mate/go-mate)
 [![GitHub Release](https://img.shields.io/github/release/go-mate/go-mate.svg)](https://github.com/go-mate/go-mate/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-mate/go-mate)](https://goreportcard.com/report/github.com/go-mate/go-mate)
 
@@ -17,14 +17,6 @@ Go 项目开发的配置管理助手组件。
 [ENGLISH README](README.md)
 <!-- TEMPLATE (ZH) END: LANGUAGE NAVIGATION -->
 
-## 核心特性
-
-📋 **JSON 配置加载**: 简单高效的 JSON 配置文件解析功能
-🔄 **工作区集成**: 与 go-work 包完美集成的工作区管理
-⚡ **轻量级设计**: 专注配置管理核心功能，最小化依赖
-🌍 **结构转换**: 提供配置结构到工作区结构的便捷转换
-📝 **标准格式**: 支持标准 JSON 配置格式的序列化和反序列化
-
 ## 安装
 
 ```bash
@@ -33,9 +25,30 @@ go get github.com/go-mate/go-mate/workmate
 
 ## 使用方法
 
-### JSON 配置文件格式
+### 基础用法
 
-创建配置文件 `mate.json`：
+```go
+package main
+
+import (
+    "github.com/go-mate/go-mate/workmate"
+)
+
+func main() {
+    // 加载配置
+    config := workmate.NewWorkspace("mate.json")
+
+    // 转换为 go-work 格式
+    workspace := config.GetWorkspace()
+
+    // 现在可以用 workspace 配合 go-work 命令使用
+}
+```
+
+
+### 配置文件
+
+创建配置 `mate.json`：
 
 ```json
 {
@@ -50,108 +63,33 @@ go get github.com/go-mate/go-mate/workmate
 }
 ```
 
-### 基础用法
+## mate 生态系统
 
-```go
-package main
-
-import (
-    "github.com/go-mate/go-mate/workmate"
-    "github.com/go-mate/go-work/worksexec"
-    "github.com/yyle88/osexec"
-)
-
-func main() {
-    // 加载配置文件
-    workspace := workmate.NewWorkspace("mate.json")
-
-    // 转换为 go-work 格式
-    goWorkspace := workspace.GetWorkspace()
-
-    // 创建执行配置
-    execConfig := osexec.NewCommandConfig()
-    workspaces := []*workspace.Workspace{goWorkspace}
-    config := worksexec.NewWorksExec(execConfig, workspaces)
-
-    // 使用配置执行命令
-    // config.ForeachWorkRun(...)
-}
+```bash
+# 根据需要获取工具
+go install github.com/go-mate/depbump/cmd/depbump@latest   # 依赖管理
+go install github.com/go-mate/go-commit/cmd/go-commit@latest # 带 Go 格式化的 Git 提交
+go install github.com/go-mate/go-lint/cmd/go-lint@latest   # 代码检查
+go install github.com/go-mate/go-work/cmd/go-work@latest   # 工作区管理
+go install github.com/go-mate/tago/cmd/tago@latest         # Git 标签管理
 ```
 
-### 配置结构说明
+go-mate 在 mate 生态系统中扮演**配置管理组件**的角色：
 
-- **workRoot**: 工作区根目录路径
-- **projects**: 包含在此工作区中的项目路径列表
-
-### 与 go-work 集成
-
-go-mate 的主要作用是提供配置文件支持，与 go-work 包配合使用：
-
-```go
-// 从 JSON 加载配置
-workspace := workmate.NewWorkspace("config.json")
-
-// 转换为 go-work 可用格式
-goWorkspace := workspace.GetWorkspace()
-
-// 用在 go-work 操作中
-config := worksexec.NewWorksExec(execConfig, []*workspace.Workspace{goWorkspace})
 ```
-
-## API 文档
-
-### Workspace 结构体
-
-```go
-type Workspace struct {
-    WorkRoot string   `json:"workRoot"` // 工作区根目录
-    Projects []string `json:"projects"` // 此工作区中的项目路径
-}
+配置管理
+    ↓
+go-mate (JSON 配置加载)
+    ↓
+go-work (工作区执行)
+    ↓
+开发工具 (depbump, go-commit, go-lint, tago)
 ```
-
-### 主要方法
-
-- `NewWorkspace(path string) *Workspace`: 从 JSON 文件加载工作区配置
-- `GetWorkspace() *workspace.Workspace`: 转换为 go-work 包兼容的格式
-
-## 使用场景
-
-### 多项目开发环境
-- 统一管理多个 Go 项目的配置
-- 批量执行跨项目命令操作
-- 工作区级别的依赖管理
-
-### 自动化脚本
-- 提供配置驱动的项目管理
-- 支持 CI/CD 流水线配置
-- 简化复杂项目结构的操作
-
-### 开发工具集成
-- 与 mate 生态系统组件配合
-- 为 IDE 和编辑器提供项目配置
-- 支持开发环境的快速切换
-
-## 设计理念
-
-### 简单性
-- 精简的 API 设计
-- 专注配置管理核心功能
-- 易于理解和使用的接口
-
-### 集成性
-- 与 go-work 包完美集成
-- 支持 mate 生态系统协作
-- 标准化的配置格式
-
-### 可扩展性
-- 灵活的 JSON 配置结构
-- 支持未来功能扩展
-- 兼容性优先的设计
 
 ---
 
 <!-- TEMPLATE (ZH) BEGIN: STANDARD PROJECT FOOTER -->
-<!-- VERSION 2025-09-06 04:53:24.895249 +0000 UTC -->
+<!-- VERSION 2025-09-26 07:39:27.188023 +0000 UTC -->
 
 ## 📄 许可证类型
 
@@ -189,7 +127,7 @@ MIT 许可证。详见 [LICENSE](LICENSE)。
 8. **暂存**：暂存更改（`git add .`）
 9. **提交**：提交更改（`git commit -m "Add feature xxx"`）确保向后兼容的代码
 10. **推送**：推送到分支（`git push origin feature/xxx`）
-11. **PR**：在 GitHub 上打开 Pull Request（在 GitHub 网页上）并提供详细描述
+11. **PR**：在 GitHub 上打开 Merge Request（在 GitHub 网页上）并提供详细描述
 
 请确保测试通过并包含相关的文档更新。
 
@@ -197,7 +135,7 @@ MIT 许可证。详见 [LICENSE](LICENSE)。
 
 ## 🌟 项目支持
 
-非常欢迎通过提交 Pull Request 和报告问题来为此项目做出贡献。
+非常欢迎通过提交 Merge Request 和报告问题来为此项目做出贡献。
 
 **项目支持：**
 
@@ -206,7 +144,7 @@ MIT 许可证。详见 [LICENSE](LICENSE)。
 - 📝 **撰写博客**关于开发工具和工作流程 - 我们提供写作支持
 - 🌟 **加入生态** - 致力于支持开源和（golang）开发场景
 
-**祝你用这个包编程愉快！** 🎉
+**祝你用这个包编程愉快！** 🎉🎉🎉
 
 <!-- TEMPLATE (ZH) END: STANDARD PROJECT FOOTER -->
 
